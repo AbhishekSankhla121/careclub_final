@@ -264,7 +264,7 @@
         
           
           else if ("<%= msg.success %>"){
-            openModal("<%= msg.success %>","<%= session %>");
+            openModal("<%= msg.success %>","hehehh");
             modalContent.style.backgroundColor = "14BB28";
       modalContent.style.color="white";
      
@@ -275,6 +275,12 @@
       }
       if (window.location.pathname === '/details') {
       var closeButton = document.getElementById("closeButton");
+    closeButton.addEventListener("click", function () {
+      window.location.href = '/events'; // Redirect to /events
+    });
+}
+else{
+  var closeButton = document.getElementById("closeButton");
     closeButton.addEventListener("click", function () {
       window.location.href = '/events'; // Redirect to /events
     });

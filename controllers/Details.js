@@ -17,10 +17,8 @@ const addDetails=(userData)=>async(req,res)=>{
         if(result.modifiedCount == 1){
             req.flash("success","profile is updated")
             console.log("--------------------------1")
-            
-    console.log(req.session.user.u_city) 
       
-    res.render('event',{msg:req.flash(),session:req.session.user.u_city}) //Abhishek res.render("AllEvents",{msg:req.flash()})
+    res.render('event',{msg:req.flash()}) //Abhishek res.render("AllEvents",{msg:req.flash()})
             
         }else{
             req.flash("error","An Error Occured") 

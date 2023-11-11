@@ -36,6 +36,15 @@ app.post('/join-event/:id',(req,res)=>eventDetails.joinEvents(req,res,eventData)
 app.get('/joined-events',(req,res)=>eventDetails.getJoinedEventsFile(req,res,eventData))
 app.get('/organised-events',(req,res)=>eventDetails.organisedEvents(req,res,eventData))
 // app.post('/joined-events',eventDetails.JoinedEvents(eventData))
+
+
+//written by abishek start here 
+app.get('/like', eventDetails.likeEvent);
+//written by abishek end  here 
+
+
+
+
 app.get('/test',async(req,res)=>{
     console.log(req.session.user._id)
     // let result =await eventData.find();

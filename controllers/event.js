@@ -97,7 +97,7 @@ console.log(req.file)
             
             // let result=await eventData.updateOne({_id:req.params.id},{$push: { e_joinies: req.session.user._id }})
     var flag=false;
-    let check=result1.e_joinies;
+    let check=result1.e_joinies; 
     check.forEach(element => {
         if (element.equals(req.session.user._id)) {
             flag=true;
@@ -147,11 +147,25 @@ const organisedEvents=async(req,res,eventData)=>{
     
    }
 
+
+
+//written by abhishek start//
+const likeEvent = async (req, res) => {
+    res.send("this is working ")
+}
+//Written by abhishek close //
+
+
+
+
+
+
 module.exports={
     getEventFile,
     createEvent,
     getAllEvent,
     joinEvents,
     getJoinedEventsFile,
-    organisedEvents
+    organisedEvents,
+    likeEvent   //add by abhishek
 }
