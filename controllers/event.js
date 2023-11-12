@@ -16,8 +16,8 @@ const getAllEvent=async(req,res,eventData)=>{
     else{
        
     let result2=await eventData.find({e_city:result1.u_city});
-    req.flash("check","number and city not found!  ")
-    console.log("----------------------------");
+    req.flash("check","success ")
+    console.log("----------------------------getAllEvent-------------");
     console.log(result2);
     res.render("event",{msg:req.flash(),events:result2});
 
@@ -150,13 +150,112 @@ const organisedEvents=async(req,res,eventData)=>{
 
 
 //written by abhishek start//
-const likeEvent = async (req, res) => {
-    res.send("this is working ")
+//written by abhishek start//
+const likeEvent = async (req, res,eventData) => {
+    const eventId = "654fb13b358138ac96e75e70";
+    const userId = "654fae7f088ad3633a700f17";
+    
+    try {
+        let result = await eventData.findById({_id:eventId});
+        console.log("this is event id:");
+        console.log(eventId);
+        console.log("--------");
+        console.log("event details");
+        console.log(result);
+
+        // Check if the user has already liked the event
+        const userLiked = result.e_likes.includes(userId);
+
+        if (userLiked) {
+            // If the user already liked the event, remove the like
+            const userIndex = result.e_likes.indexOf(userId);
+            result.e_likes.splice(userIndex, 1);
+            result.e_likes_count -= 1;
+            await result.save();
+            res.json({result});
+            return console.log("User already liked this post !!");
+        } else {
+            // If the user has not liked the event, add the like
+            result.e_likes.push(userId);
+            result.e_likes_count += 1;
+            await result.save();
+            res.json({result});
+            return console.log("User liked the post !!");
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 }
-//Written by abhishek close //
 
 
+const commentEvent = async (req, res, eventData) => {
+    const eventId = req.params.id;
+    const userId = "654fae7f088ad3633a700f18";
 
+    const commentData = {
+        text: req.body.text,
+        user: userId,
+    };
+
+    try {
+        const event = await eventData.findById({ _id: eventId });
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        // Add the new comment to the event
+        event.e_comments.push(commentData);
+
+        // Update comments count
+        event.e_comments_count = event.e_comments.length;
+
+        // Save the event
+        await event.save();
+
+        console.log(event); // Log the updated event
+
+        res.status(200).json({ message: 'Comment added successfully', event });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+const deleteComment = async (req, res, eventData) => {
+    const eventId = req.params.eventId;
+    const commentId = req.params.commentId;
+
+    try {
+        const event = await eventData.findById({ _id: eventId });
+
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        // Find the index of the comment to be deleted
+        const commentIndex = event.e_comments.findIndex(comment => comment._id.equals(commentId));
+
+        if (commentIndex === -1) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+
+        // Remove the comment from the array
+        event.e_comments.splice(commentIndex, 1);
+
+        // Update comments count
+        event.e_comments_count = event.e_comments.length;
+
+        // Save the updated event
+        await event.save();
+
+        return res.status(200).json({ message: 'Comment deleted successfully', event });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
 
 
 
@@ -167,5 +266,7 @@ module.exports={
     joinEvents,
     getJoinedEventsFile,
     organisedEvents,
-    likeEvent   //add by abhishek
+    likeEvent,//add by abhishek
+    commentEvent, // add by abhishek
+    deleteComment // add by abhishek
 }

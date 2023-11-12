@@ -39,7 +39,10 @@ app.get('/organised-events',(req,res)=>eventDetails.organisedEvents(req,res,even
 
 
 //written by abishek start here 
-app.get('/like', eventDetails.likeEvent);
+app.get('/like',(req,res)=> eventDetails.likeEvent(req,res,eventData));
+app.post('/comment/:id',(req,res)=> eventDetails.commentEvent(req,res,eventData));
+app.delete('/deletecomment/:eventId/:commentId', (req, res) => eventDetails.deleteComment(req, res, eventData));
+
 //written by abishek end  here 
 
 

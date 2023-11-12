@@ -1,4 +1,10 @@
 const mongoose=require('mongoose');
+
+const commentSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'userData', required: true },
+    text: { type: String, required: true },
+});
+
 const Sc=mongoose.Schema({
     e_name:{type:String,required:true},
     e_desc:{type:String,default:null},
@@ -7,7 +13,7 @@ const Sc=mongoose.Schema({
     
     //written by abhishek start
     e_likes:[{type:mongoose.Schema.ObjectId,default:0,ref:'userData'}],
-    e_comments:[{type:mongoose.Schema.ObjectId,default:0,ref:'userData'}],
+    e_comments:[commentSchema],
     e_likes_count:{type:Number,default:0},
     e_comments_count:{type:Number,default:0} , 
     //written by abhishek end 

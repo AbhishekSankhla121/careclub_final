@@ -10,7 +10,7 @@ const addDetails=(userData)=>async(req,res)=>{
         req.flash("error","Please Fill All Details")//abhishek
         res.render("event",{msg:req.flash()})//abhishek
     }else{
-        console.log("hehehehehhehehehehehehhe ")
+        console.log("your phone number and city is updated from addDetails end point")
        
         let result= await userData.updateOne({ _id: req.session.user._id }, { $set: { u_city:req.body.u_city,u_phone:req.body.u_phone,LIC_NO:req.body.LIC_NO} })
        
