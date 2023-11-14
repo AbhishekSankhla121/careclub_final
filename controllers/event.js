@@ -19,7 +19,8 @@ const getAllEvent=async(req,res,eventData)=>{
     req.flash("check","success ")
     console.log("----------------------------getAllEvent-------------");
     console.log(result2);
-    res.render("event",{msg:req.flash(),events:result2});
+    console.log(result1);
+    res.render("event",{msg:req.flash(),events:result2,profile:result1});
 
 
     }
@@ -191,13 +192,17 @@ const likeEvent = async (req, res,eventData) => {
 
 const commentEvent = async (req, res, eventData) => {
     const eventId = req.params.id;
-    const userId = "654fae7f088ad3633a700f18";
-
+    const userId = "654fae7f088ad3633a700f17";
+    let result1=await userData.findOne({_id:userId}) 
+    console.log(result1.u_name);
     const commentData = {
         text: req.body.text,
         user: userId,
+    
+        user_profile_image: result1.Image_URL===null? "null":result1.Image_URL,
+        user_name: result1.u_name
     };
-
+    
     try {
         const event = await eventData.findById({ _id: eventId });
         if (!event) {
@@ -222,10 +227,8 @@ const commentEvent = async (req, res, eventData) => {
     }
 };
 
-
-const deleteComment = async (req, res, eventData) => {
+const getComment = async (req, res, eventData) => {
     const eventId = req.params.eventId;
-    const commentId = req.params.commentId;
 
     try {
         const event = await eventData.findById({ _id: eventId });
@@ -234,28 +237,14 @@ const deleteComment = async (req, res, eventData) => {
             return res.status(404).json({ message: 'Event not found' });
         }
 
-        // Find the index of the comment to be deleted
-        const commentIndex = event.e_comments.findIndex(comment => comment._id.equals(commentId));
-
-        if (commentIndex === -1) {
-            return res.status(404).json({ message: 'Comment not found' });
-        }
-
-        // Remove the comment from the array
-        event.e_comments.splice(commentIndex, 1);
-
-        // Update comments count
-        event.e_comments_count = event.e_comments.length;
-
-        // Save the updated event
-        await event.save();
-
-        return res.status(200).json({ message: 'Comment deleted successfully', event });
+        // Send the event data as a JSON response
+        res.send(event.e_comments[0].user)
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
 
 
 
@@ -268,5 +257,5 @@ module.exports={
     organisedEvents,
     likeEvent,//add by abhishek
     commentEvent, // add by abhishek
-    deleteComment // add by abhishek
+    getComment // add by abhishek
 }
