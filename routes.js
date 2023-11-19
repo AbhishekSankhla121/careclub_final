@@ -40,7 +40,7 @@ app.get('/organised-events',(req,res)=>eventDetails.organisedEvents(req,res,even
 
 //written by abishek start here 
 app.get('/like',(req,res)=> eventDetails.likeEvent(req,res,eventData));
-app.post('/comment/:id',(req,res)=> eventDetails.commentEvent(req,res,eventData));
+app.post('/comment/:id/:usrid',(req,res)=> eventDetails.commentEvent(req,res,eventData));
 app.get('/getcomment/:eventId', (req, res) => eventDetails.getComment(req, res, eventData));
 
 //written by abishek end  here 

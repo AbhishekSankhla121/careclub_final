@@ -18,9 +18,9 @@ const getAllEvent=async(req,res,eventData)=>{
     let result2=await eventData.find({e_city:result1.u_city});
     req.flash("check","success ")
     console.log("----------------------------getAllEvent-------------");
-    console.log(result2);
-    console.log(result1);
-    res.render("event",{msg:req.flash(),events:result2,profile:result1});
+    console.log(result2[0].e_comments);
+   
+    res.render("event",{msg:req.flash(),events:result2,profile:result1 ,cmt:result2[0].e_comments,cmtpp:result2[0].e_comments[0].event_profile_image});
 
 
     }
@@ -65,6 +65,7 @@ console.log(req.file)
       toString(tmp);
       let hastags=[]
        hastags=tmp.split(',');
+       
        let newEvent= new eventData({
            e_name:req.body.e_name,
            e_date:req.body.e_date,
@@ -151,7 +152,7 @@ const organisedEvents=async(req,res,eventData)=>{
 
 
 //written by abhishek start//
-//written by abhishek start//
+
 const likeEvent = async (req, res,eventData) => {
     const eventId = "654fb13b358138ac96e75e70";
     const userId = "654fae7f088ad3633a700f17";
@@ -192,18 +193,20 @@ const likeEvent = async (req, res,eventData) => {
 
 const commentEvent = async (req, res, eventData) => {
     const eventId = req.params.id;
-    const userId = "654fae7f088ad3633a700f17";
-    let result1=await userData.findOne({_id:userId}) 
-    console.log(result1.u_name);
+    const userId = req.params.usrid;
+
+    let result1=await userData.findOne({_id:userId});
+    let result2 =await eventData.findOne({_id:eventId});
+   
     const commentData = {
-        text: req.body.text,
-        user: userId,
-    
+        text: req.body.commenttext,
         user_profile_image: result1.Image_URL===null? "null":result1.Image_URL,
-        user_name: result1.u_name
+        user_name: result1.u_name,
+        event_profile_image:result2.e_image
     };
     
     try {
+        console.log(eventId)
         const event = await eventData.findById({ _id: eventId });
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
@@ -217,35 +220,46 @@ const commentEvent = async (req, res, eventData) => {
 
         // Save the event
         await event.save();
-
-        console.log(event); // Log the updated event
-
-        res.status(200).json({ message: 'Comment added successfully', event });
+        req.flash("Comment","number and city not found!  ")//abhishek
+        res.render("comment",{eventId:eventId});
+        
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        req.flash("error","comment not found ! ")
+        res.render("event",{msg:req.flash()});
     }
 };
-
 const getComment = async (req, res, eventData) => {
-    const eventId = req.params.eventId;
-
     try {
-        const event = await eventData.findById({ _id: eventId });
+        const userId = req.user._id;
+        
+        // Use findOne directly to find the user
+        const user = await userData.findOne({ _id: userId });
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const events = await eventData.find({ e_city: user.u_city });
+
+        const eventId = req.params.eventId;
+        const event = await eventData.findById(eventId);
 
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
         }
 
+        req.flash("Comment", "Number and city not found!"); // Abhishek
+
         // Send the event data as a JSON response
-        res.send(event.e_comments[0].user)
+        res.render("event", { msg: req.flash(), events: events, profile: user, commentdata: event });
+
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Internal server error' });
+        req.flash("error", "Invalid request");
+        return res.render("event", { msg: req.flash() });
     }
 };
 
-
+//written by abhishek end here//
 
 
 module.exports={

@@ -427,10 +427,12 @@ else{
                             
                             
                             <!-- ---------------------- comment testing---------------------------- -->
-                            
-                            <div class="comment col-4 my-2 "  onclick="showCommentModal(`<%= userdetail._id %>,<%= profile._id %>`)">
-                              <i class="far fa-comment" style="font-size:20px;color:#e74c3c" ></i> <b style="color:#e74c3c" >Comment</b>
-                            </div>
+                            <div class="comment col-4 my-2" onclick="showCommentModal('<%= userdetail._id %>')">
+                              <i class="far fa-comment" style="font-size:20px;color:#e74c3c"></i>
+                              <b style="color:#e74c3c">comment </b>
+                          </div>
+                          
+                          
 
                             <div class="upvote-button col-4 my-1">
                               <span id="upvote" class="upvote">+ Join Event</span>
@@ -519,11 +521,12 @@ else{
 <!-- --------------------code for comment modal start here------------------------ -->
 
 <!-- Modal -->
+<%if(msg.Comment){%>
 <div class="modal fade" id="comment-Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content bg-dark">
       <div class="modal-header">
-        <h1 class="modal-title fs-5 text-white" id="exampleModalLabel">Comments</h1>
+        <h1 class="modal-title fs-5 text-white" id="exampleModalLabel">comments</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
       </div>
       <div class="card bg-dark text-white">
@@ -533,39 +536,44 @@ else{
         
           <div class="row g-0" id="laptopcmnt">
             <div class="col-6">
-              <img src="/images/event/7309681.jpg" class="img-fluid rounded-start" alt="...">
+              <img src=<%= commentdata.e_image  %> class="img-fluid rounded-start" alt="...">
             </div>
+            
+            
             <div class="col-6">
+
+              
               <div class="card-body ">
                 <div class="card bg-primary text-white " style="margin-top:-1em;">
-                    <div class="card-body">
+                    
+                  
+                  
+                
+                  <div class="card-body">
                       <div class="com2 crdbdy">
        
 
-
-                       
-                        <img src="/images/event/7309681.jpg" style="height:40px;width:40px;object-fit: cover; border-radius:100% ;">
-                        <b>Abhay Bissa</b>
+                        <% commentdata.e_comments.forEach(commentusr => { %>
+                          
+                          
+                      
+                          <img src=<%= commentusr.user_profile_image ==="null"?"/images/event/7309681.jpg":commentusr.user_profile_image %> style="height:40px;width:40px;object-fit: cover; border-radius:100% ;">
+                          <b><%= commentusr.user_name %></b>  
                         <p class="ms-1 my-1">
                           
-                          <div class="content hideContent"><b>
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut 
-                            labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et 
-                            accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no 
-                            sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, 
-                            consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore 
-                            et dolore magna aliquyam erat, sed diam voluptua.</b>
+                          <div class="content hideContent">
+                            <b> <%= commentusr.text %> </b>
                         </div>
                         <div class="show-more" id="abcdef">
                             <a href="#" class="linkshow">Show more</a>
                         </div>
 
 
-
+                        </p>
                         <hr>
                    
-                        
-                
+                       
+                        <% }); %>
                     
 
                       
@@ -576,9 +584,10 @@ else{
                     </div>
                     
                   </div>
+
                   <div class="postcmnt">
-                    <form method="post" action="">
-                    <br><input type="text" class="form-control bg-primary text-white" placeholder="Post your comment" id="input1"><hr>
+                    <form  action="/comment/<%= commentdata._id %>/<%= profile._id %>" method="post" >
+                    <br><input type="text" class="form-control bg-primary text-white" placeholder="Post your comment" id="input1" name="commenttext"><hr>
                     <button type="submit" class="bg-primary text-white form-control" style="max-width: min-content;">POST</button>
                   </form>
                   </div>
@@ -632,14 +641,7 @@ else{
 </div>
 </div>
 </div>
-<form action="" method="post">
-<div class="modal-footer">
-  <!--  -->
-  <input type="text" class="form-control bg-primary text-white" placeholder="Enter your comment" style="max-width:11em;" id="input1">
-  <button type="submit" class="form-control bg-primary text-white" style="max-width: max-content;">send</button>
-  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-  <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-</form>
+
 </div>
 
 
@@ -655,20 +657,22 @@ else{
     </div>
   </div>
 </div>
-
-
-
-
+<%}%>
 
 <script>
-  // Function to show the modal
-  function showCommentModal(eventId,userId) {
-    document.getElementById("modalEventId").innerText = eventId;
-    var commentModal = new bootstrap.Modal(document.getElementById("comment-Modal"));
-    console.log(eventId)
-    console.log(userId)
-    commentModal.show();
-  }
+     document.addEventListener("DOMContentLoaded", function () {
+      var commentModal = new bootstrap.Modal(document.getElementById("comment-Modal"));
+      commentModal.show();
+     });
+
+   
+    function showCommentModal(eventId) {
+        console.log(eventId)
+      window.location.href = `/getcomment/${eventId}`;
+        
+            
+    }
+  
 </script>
 <!-- -----------------------comment ending----------------------------- -->
 <!-- --------------------code for comment modal End  here------------------------ -->

@@ -3,7 +3,9 @@ const mongoose=require('mongoose');
 const commentSchema = new mongoose.Schema({
     text: { type: String, required: true },
     user_profile_image:{type:String,required:false},
-    user_name:{type:String,required:true}
+    user_name:{type:String,required:true},
+    event_profile_image:{type:String,required:false},
+    
 });
 
 const Sc=mongoose.Schema({
