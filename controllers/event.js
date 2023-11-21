@@ -81,12 +81,13 @@ console.log(req.file)
            e_org_contact:req.session.user.u_phone,
            e_hashtags:hastags
         });
-        
+       
         newEvent.save().then((result)=>{
             
             return res.redirect('/organised-events');
             
         }).catch((err)=>{
+            
             console.log(err);
             req.flash("error","Error in creating event")
                 return res.render("event",{msg:req.flash()});  
@@ -154,7 +155,7 @@ const organisedEvents=async(req,res,eventData)=>{
 //written by abhishek start//
 
 const likeEvent = async (req, res,eventData) => {
-    const eventId = "654fb13b358138ac96e75e70";
+    const eventId = "654fb29d358138ac96e75e75";
     const userId = "654fae7f088ad3633a700f17";
     
     try {
