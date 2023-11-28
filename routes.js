@@ -32,7 +32,8 @@ app.post('/details',updateDetails.addDetails(userData))//handelin detail
 app.get('/get-event',(req,res)=>eventDetails.getEventFile(req,res));//rendring event ejs file 
 app.post('/create-event',upload.single("e_image"),eventDetails.createEvent(eventData,storage))//handeling event
 app.get('/events',(req,res)=>eventDetails.getAllEvent(req,res,eventData));//getting all events
-app.post('/join-event/:id',(req,res)=>eventDetails.joinEvents(req,res,eventData))
+app.get('/join-event/:id',(req,res)=>eventDetails.joinEvents(req,res,eventData))
+
 app.get('/joined-events',(req,res)=>eventDetails.getJoinedEventsFile(req,res,eventData))
 app.get('/organised-events',(req,res)=>eventDetails.organisedEvents(req,res,eventData))
 // app.post('/joined-events',eventDetails.JoinedEvents(eventData))
@@ -45,7 +46,35 @@ app.get('/getcomment/:eventId', (req, res) => eventDetails.getComment(req, res, 
 
 //written by abishek end  here 
 
+app.get('/profile',async(req,res)=>{
+    console.log("USERRRRRR")
+   console.log(req.session.user._id)
+   var user=await userData.findOne({_id:req.session.user._id})
+   console.log(user.u_events_joined)
+   console.log(user.u_events_joined.length)
+var joinedCount=user.u_events_joined.length;
+   var result;
+   let tmp=await eventData.find({e_joinies:req.session.user._id})
+console.log("________________________")
+ if(tmp.length > 0){
+    result=tmp
+ }
+ else{
+    req.flash("error","You Have Not Joined Any Event")
+    result=null
+ }
+ //joined event close
+ var result1;
+ let tmp2=await eventData.find({e_org_id:req.session.user._id})
+ if(tmp2.length >0){
+    result1=tmp2;
+}else{
+     req.flash("error","You Have Not Created Any Event")
+     result1=null;
+ }//you can even check if result is true or not
 
+    res.render("profile_care",{msg:req.flash(),joinedEvents:result,orgEvents:result1,user:user,joinedCount:joinedCount})
+})
 
 
 app.get('/test',async(req,res)=>{

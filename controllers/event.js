@@ -10,26 +10,26 @@ const getAllEvent=async(req,res,eventData)=>{
     
     if(result1.u_phone == null && result1.u_city == null){
         req.flash("UserDetails","number and city not found!  ")//abhishek
-        console.log("helllo worlld")//abhishek
         return res.render("event",{msg:req.flash(),events:null})// abhishek 
     }
     else{
        
     let result2=await eventData.find({e_city:result1.u_city});
     req.flash("check","success ")
-    console.log("----------------------------getAllEvent-------------");
-    console.log(result2[0].e_comments);
-   
-    res.render("event",{msg:req.flash(),events:result2,profile:result1 ,cmt:result2[0].e_comments,cmtpp:result2[0].e_comments[0].event_profile_image});
 
-
+    res.render("event", {
+        msg: req.flash(),
+        events: result2,
+        profile: result1,
+        cmt: result2[0]?.e_comments || [], // Use optional chaining to handle potential undefined value
+        cmtpp: result2[0]?.e_comments[0]?.event_profile_image || null, // Use optional chaining to handle potential undefined value
+    });
     }
 }
 const createEvent=(eventData,storage)=>async(req,res)=>{
     var today = new Date();
     const {e_name,e_desc,e_location,e_city,e_date,e_time,e_timezone,e_hashtags}=req.body;
     var d=new Date(e_date)
-    console.log(req.body)
     if(!e_name || !e_desc || !e_location || !e_city  || !e_date || !e_time || !e_timezone || !e_hashtags){
     req.flash("error","please fill all details")
     return res.render("event",{msg:req.flash()})
@@ -49,7 +49,6 @@ else{
 
  }
  if(valid){
-console.log(req.file)
      const storageRef = ref(storage, `events/${+Math.floor((Math.random() * 1000) + 1)+"-"+req.file.originalname}`);
      const metaData={
          contentType:req.file.mimetype,
@@ -83,8 +82,9 @@ console.log(req.file)
         });
        
         newEvent.save().then((result)=>{
-            
-            return res.redirect('/organised-events');
+            console.log("_______________________");
+            console.log(result)
+            return res.redirect('/profile');
             
         }).catch((err)=>{
             
@@ -95,60 +95,57 @@ console.log(req.file)
         }
     }
     };
+ 
     const joinEvents=async(req,res,eventData)=>{
-            let result1=await eventData.findOne({_id:req.params.id})
-            
-            // let result=await eventData.updateOne({_id:req.params.id},{$push: { e_joinies: req.session.user._id }})
-    var flag=false;
-    let check=result1.e_joinies; 
-    check.forEach(element => {
-        if (element.equals(req.session.user._id)) {
-            flag=true;
-        }
+        let result1=await eventData.findOne({_id:req.params.id})
         
-    });
-    if(!flag){
-    let result=await eventData.updateOne({_id:req.params.id},{$push: { e_joinies: req.session.user._id }})
-        console.log(result)
-    if(result.modifiedCount == 1){
-        res.redirect('/joined-events');
-    }else{
-        req.flash("error","An Error Occured")
-        res.redirect('/events')
+        // let result=await eventData.updateOne({_id:req.params.id},{$push: { e_joinies: req.session.user._id }})
+var flag=false;
+let check=result1.e_joinies; 
+check.forEach(element => {
+    if (element.equals(req.session.user._id)) {
+        flag=true;
+    }
+    
+});
+if(!flag){
+let result=await eventData.updateOne({_id:req.params.id},{$push: { e_joinies: req.session.user._id }})
+if(result.modifiedCount == 1){
+    res.redirect('/profile');
+}else{
+    req.flash("error","An Error Occured")
+    res.redirect('/events')
 
-    }//you can even check if result is true or not
-    }
-    else{
-        req.flash("error","you have  already joined")
-        res.redirect('/events')
-    }
+}//you can even check if result is true or not
+}
+else{
+    req.flash("error","you have  already joined")
+    res.redirect('/events')
+}
 }
 const getJoinedEventsFile=async (req,res,eventData)=>{
-    console.log(req.session.user._id)
- 
-let result=await eventData.find({e_joinies:req.session.user._id})
- console.log(result)   
- if(result.length > 0){
 
-     res.render("joinedEvents",{msg:req.flash(),events:result});
- }
- else{
-    req.flash("error","You Have Not Joined Any Event")
-    res.render("joinedEvents",{msg:req.flash(),events:null})
- }
+let result=await eventData.find({e_joinies:req.session.user._id})
+if(result.length > 0){
+
+ res.render("profile_care",{msg:req.flash(),joinedEvents:result});
+}
+else{
+req.flash("error","You Have Not Joined Any Event")
+res.render("profile_care",{msg:req.flash(),joinedEvents:null})
+}
 }
 const organisedEvents=async(req,res,eventData)=>{
-    console.log(req.session.user._id)
-    let result=await eventData.find({e_org_id:req.session.user._id})
-    console.log(result);
-    if(result.length >0){
-        res.render("orgnaisedEvents",{msg:req.flash(),events:result});
-    }else{
-        req.flash("error","You Have Not Created Any Event")
-        res.render("orgnaisedEvents",{msg:req.flash()})
-    }//you can even check if result is true or not
-    
-   }
+let result=await eventData.find({e_org_id:req.session.user._id})
+
+if(result.length >0){
+    res.render("profile_care",{msg:req.flash(),orgEvents:result});
+}else{
+    req.flash("error","You Have Not Created Any Event")
+    res.render("profile_care",{msg:req.flash(),orgEvents:null})
+}//you can even check if result is true or not
+
+}
 
 
 
@@ -160,11 +157,7 @@ const likeEvent = async (req, res,eventData) => {
     
     try {
         let result = await eventData.findById({_id:eventId});
-        console.log("this is event id:");
-        console.log(eventId);
-        console.log("--------");
-        console.log("event details");
-        console.log(result);
+        
 
         // Check if the user has already liked the event
         const userLiked = result.e_likes.includes(userId);
@@ -207,7 +200,6 @@ const commentEvent = async (req, res, eventData) => {
     };
     
     try {
-        console.log(eventId)
         const event = await eventData.findById({ _id: eventId });
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
